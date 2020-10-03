@@ -51,3 +51,15 @@ into code that expects to only read data from trusted sources, and as
 such circumvent input validation.
 
 ## Security controls for stopping SSRF
+
+Simple blacklists and regular expressions applied to user input are a bad approach to mitigating SSRF. In general, blacklists are a poor means of security control. Attackers will always find methods to bypass them. In this case, an attacker can use an HTTP redirect, a wildcard DNS service such as xip.io, or even alternate IP encoding.
+
+Whitelists and DNS resolution : The most robust way to avoid Server Side Request Forgery (SSRF) is to whitelist the DNS name or IP address that your application needs to access. If a whitelist approach does not suit you and you must rely on a blacklist, it’s important to validate user input properly. For example, do not allow requests to private (non-routable) IP addresses (detailed in RFC 1918).
+
+However, in the case of a blacklist, the correct mitigation to adopt will vary from application to application. In other words, there is no universal fix to SSRF because it highly depends on application functionality and business requirements.
+
+Response handling :To prevent response data leaking to the attacker, you must ensure that the received response is as expected. Under no circumstances should the raw response body from the request sent by the server be delivered to the client.
+
+Disable unused URL schemas :If your application only uses HTTP or HTTPS to make requests, allow only these URL schemas. If you disable unused URL schemas, the attacker will be unable to use the web application to make requests using potentially dangerous schemas such as file:///, dict://, ftp:// and gopher://.
+
+Authentication on internal services:By default, services such as Memcached, Redis, Elasticsearch, and MongoDB do not require authentication. An attacker can use Server Side Request Forgery vulnerabilities to access some of these services without any authentication. Therefore, to ensure web application security, it’s best to enable authentication wherever possible, even for services on the local network.
